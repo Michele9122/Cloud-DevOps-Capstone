@@ -1,0 +1,38 @@
+pipeline {
+	environment {
+        dockerhubCredentials = 'dockerhubCredentials'
+    }
+	agent any
+	stages {
+		stage('linting') {
+			steps {
+				sh 'tidy -q -e index.html'
+			}
+		}
+		stage('build docker image') {
+            steps {
+                sh 'docker build -t sistemielettronici/capstoneudacity .'
+            }
+        }
+		stage('push to dockerhub') {
+			steps {
+				sh 'docker push sistemielettronici/capstoneudacity'
+				}
+			}
+		}
+		stage('build container') {
+      		steps {
+			    sh 'docker run --name capstoneudacity -d -p 80:80 sistemielettronici/capstoneudacity'
+            }
+        }
+		stage('deploying') {
+            steps {
+                dir('k8s') {
+                    withAWS(credentials: 'aws-credentials', region: 'eu-west-2') {
+                            sh "aws eks --region eu-west-2 update-kubeconfig --name capstoneudacity"
+                            sh 'kubectl apply -f capstoneudacity-k8s.yaml'
+                        }
+                  }
+           }
+       }
+}

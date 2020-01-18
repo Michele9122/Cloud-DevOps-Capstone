@@ -4,7 +4,7 @@ pipeline {
 
 		stage('create k8s cluster') {
 			steps {
-				withAWS(region:'us-east-2', credentials:'ecr_credentials') {
+				withAWS(region:'us-west-2', credentials:'aws_credentials') {
 					sh '''
 						eksctl create cluster \
 						--name capstoneudacitycluster \
@@ -15,7 +15,7 @@ pipeline {
 						--nodes-min 1 \
 						--nodes-max 3 \
 						--node-ami auto \
-						--region us-east-2 \
+						--region us-west-2 \
 					'''
 				}
 			}
@@ -25,9 +25,9 @@ pipeline {
 
 		stage('Create cluster') {
 			steps {
-				withAWS(region:'us-east-2', credentials:'ecr_credentials') {
+				withAWS(region:'us-west-2', credentials:'aws_credentials') {
 					sh '''
-						aws eks --region us-east-2 update-kubeconfig --name capstoneudacitycluster
+						aws eks --region us-west-2 update-kubeconfig --name capstoneudacitycluster
 					'''
 				}
 			}
